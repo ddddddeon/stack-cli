@@ -20,7 +20,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let url = format!("https://www.google.com/search?q=site:stackoverflow.com {query_string}");
 
     let mut links: Vec<Link> = Vec::new();
-
     get(url)
         .and_then(|d| d.text())
         .map(|text| Document::from(text.as_str()))
