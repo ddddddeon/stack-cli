@@ -1,9 +1,7 @@
 use regex::Regex;
 use reqwest::blocking::get;
-use select::document::Document;
-use select::predicate::Name;
-use std::env::args;
-use std::error::Error;
+use select::{document::Document, predicate::Name};
+use std::{env::args, error::Error};
 
 #[derive(Debug)]
 struct Link {
