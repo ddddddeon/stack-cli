@@ -10,6 +10,12 @@ use std::{
     io::{self, Read, Write},
 };
 
+#[derive(Debug)]
+struct Question {
+    name: String,
+    id: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Answer {
     body_markdown: String,
@@ -21,20 +27,29 @@ struct JSONResponse {
     items: Vec<Answer>,
 }
 
-#[derive(Debug)]
-struct Question {
-    name: String,
-    id: String,
+fn url_decode<'a>(input: &'a str) -> String {
+    let mut output = String::new();
+    let mut chars = input.chars();
+
+    while let Some(c) = chars.next() {
+        if c == '%' {
+            let hex = format!("{}{}", chars.next().unwrap(), chars.next().unwrap());
+            let decoded = u8::from_str_radix(&hex, 16).unwrap();
+            output.push(decoded as char);
+        } else {
+            output.push(c);
+        }
+    }
+    output
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let access_token = env::var("STACKOVERFLOW_API_KEY")?;
     let key = env::var("STACKOVERFLOW_KEY")?;
-
     let mut pp = PrettyPrinter::new();
-
     let link_regex =
         Regex::new(r"/url\?q=https://stack(overflow|exchange)\.com/questions/([0-9]+)/")?;
+
     let mut args: Vec<String> = args().collect();
     args.remove(0);
 
@@ -73,15 +88,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     let num: i32 = num.trim().parse()?;
     let question = &questions[num as usize];
 
-    let mut data = get(format!("https://api.stackexchange.com/2.3/questions/{}/answers?site=stackoverflow&sort=activity&filter=!nOedRLr0Wi&access_token={}&key={}", question.id, access_token, key))?;
     let mut contents = Vec::new();
-    data.read_to_end(&mut contents)?;
+    get(
+        format!("https://api.stackexchange.com/2.3/questions/{}/answers?site=stackoverflow&sort=activity&filter=!nOedRLr0Wi&access_token={}&key={}",
+                question.id, access_token, key))?
+        .read_to_end(&mut contents)?;
 
-    let mut decoder = GzDecoder::new(&contents[..]);
     let mut decoded = String::new();
+    let mut decoder = GzDecoder::new(&contents[..]);
     decoder.read_to_string(&mut decoded)?;
-    let response: JSONResponse = serde_json::from_str(&decoded)?;
 
+    let response: JSONResponse = serde_json::from_str(&decoded)?;
     let answers = response.items;
     answers
         .iter()
