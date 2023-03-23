@@ -91,11 +91,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         .read_to_end(&mut contents)?;
 
     let mut decoded = String::new();
-    let mut decoder = GzDecoder::new(&contents[..]);
-    decoder.read_to_string(&mut decoded)?;
+    GzDecoder::new(&contents[..]).read_to_string(&mut decoded)?;
 
-    let response: JSONResponse = serde_json::from_str(&decoded)?;
-    let answers = response.items;
+    let answers: Vec<Answer> = serde_json::from_str::<JSONResponse>(&decoded)?.items;
     let mut decoded_answers: Vec<String> = Vec::new();
 
     answers
