@@ -6,10 +6,18 @@ A command-line stackoverflow client
   cargo install stack-cli
 #+end_src
 
+You will need a StackExchange API token and request key, obtained via the authentication process documented [[https://api.stackexchange.com/docs/authentication][here]].
+Set the following environment variables:
+
+#+begin_src bash
+    export STACKOVERFLOW_API_KEY=<token>
+    export STACKOVERFLOW_KEY=<request key>
+#+end_src
+
 ** Usage
 #+begin_src bash
   stack-cli swap two variables without a third variable
 #+end_src
 
 The first 10 results will be output to the terminal.
-Enter the number corresponding to the stackoverflow question you'd like to view, and it will be pretty-printed as markdown.
+Enter the number corresponding to the StackOverflow question you'd like to view, and it will be pretty-printed as markdown.
