@@ -31,7 +31,8 @@ fn construct_google_url() -> String {
     let mut args: Vec<String> = args().collect();
     args.remove(0);
     let query_string = args.join("+");
-    return format!("https://www.google.com/search?q=site:stackoverflow.com {query_string}");
+
+    format!("https://www.google.com/search?q=site:stackoverflow.com {query_string}")
 }
 
 fn gather_answers(questions: Vec<Question>) -> Result<Vec<Answer>, Box<dyn Error>> {
@@ -58,18 +59,16 @@ fn gather_answers(questions: Vec<Question>) -> Result<Vec<Answer>, Box<dyn Error
 
     let mut decoded = String::new();
     GzDecoder::new(&contents[..]).read_to_string(&mut decoded)?;
-
     let answers: Vec<Answer> = serde_json::from_str::<JSONResponse>(&decoded)?.items;
+
     Ok(answers)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut pp = PrettyPrinter::new();
     let link_regex =
         Regex::new(r"/url\?q=https://stack(overflow|exchange)\.com/questions/([0-9]+)/")?;
 
     let url = construct_google_url();
-
     let questions = get(url)
         .and_then(|d| d.text())
         .map(|text| Document::from(text.as_str()))
@@ -95,7 +94,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         })?;
 
     let answers = gather_answers(questions)?;
-
     answers
         .iter()
         .filter(|item| {
@@ -111,6 +109,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         })
         .iter()
         .for_each(move |answer| {
+            let mut pp = PrettyPrinter::new();
             pp.input_from_bytes(answer.as_bytes())
                 .language("markdown")
                 .print()
