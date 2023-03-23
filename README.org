@@ -1,0 +1,15 @@
+#+TITLE: stack-cli
+A command-line stackoverflow client
+
+** Installation
+#+begin_src bash
+  cargo install stack-cli
+#+end_src
+
+** Usage
+#+begin_src bash
+  stack-cli swap two variables without a third variable
+#+end_src
+
+The first 10 results will be output to the terminal.
+Enter the number corresponding to the stackoverflow question you'd like to view, and it will be pretty-printed as markdown.
