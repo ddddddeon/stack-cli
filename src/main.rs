@@ -94,8 +94,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     GzDecoder::new(&contents[..]).read_to_string(&mut decoded)?;
 
     let answers: Vec<Answer> = serde_json::from_str::<JSONResponse>(&decoded)?.items;
-    let mut decoded_answers: Vec<String> = Vec::new();
-
     answers
         .iter()
         .filter(|item| {
@@ -104,17 +102,18 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             item.is_accepted
         })
-        .for_each(|answer| {
-            let url_decoded = htmlescape::decode_html(&answer.body_markdown).unwrap();
-            decoded_answers.push(url_decoded);
+        .map(|answer| htmlescape::decode_html(&answer.body_markdown).unwrap())
+        .fold(Vec::new(), |mut acc, answer| {
+            acc.push(answer);
+            acc
+        })
+        .iter()
+        .for_each(move |answer| {
+            pp.input_from_bytes(answer.as_bytes())
+                .language("markdown")
+                .print()
+                .unwrap();
         });
-
-    decoded_answers.iter().for_each(move |answer| {
-        pp.input_from_bytes(answer.as_bytes())
-            .language("markdown")
-            .print()
-            .unwrap();
-    });
 
     Ok(())
 }
