@@ -27,18 +27,6 @@ struct JSONResponse {
     items: Vec<Answer>,
 }
 
-fn url_decode(input: &mut str) {
-    let mut chars = input.chars();
-
-    while let Some(mut c) = chars.next() {
-        if c == '%' {
-            let hex = format!("{}{}", chars.next().unwrap(), chars.next().unwrap());
-            let decoded = u8::from_str_radix(&hex, 16).unwrap();
-            c = decoded as char;
-        }
-    }
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let access_token = env::var("STACKOVERFLOW_API_KEY")?;
     let key = env::var("STACKOVERFLOW_KEY")?;
@@ -61,9 +49,13 @@ fn main() -> Result<(), Box<dyn Error>> {
                     el.attr("href")
                         .and_then(|href| link_regex.captures(href))
                         .and_then(|captured| captured.get(2))
-                        .map(|id| Question {
-                            name: el.text(),
-                            id: String::from(id.as_str()),
+                        .map(|id| {
+                            let text = el.text();
+                            let text: Vec<&str> = text.split("stackoverflow.com").collect();
+                            return Question {
+                                name: text[0].to_string(),
+                                id: String::from(id.as_str()),
+                            };
                         })
                 })
                 .fold(Vec::new(), |mut acc, link| {
