@@ -27,20 +27,16 @@ struct JSONResponse {
     items: Vec<Answer>,
 }
 
-fn url_decode<'a>(input: &'a str) -> String {
-    let mut output = String::new();
+fn url_decode(input: &mut str) {
     let mut chars = input.chars();
 
-    while let Some(c) = chars.next() {
+    while let Some(mut c) = chars.next() {
         if c == '%' {
             let hex = format!("{}{}", chars.next().unwrap(), chars.next().unwrap());
             let decoded = u8::from_str_radix(&hex, 16).unwrap();
-            output.push(decoded as char);
-        } else {
-            output.push(c);
+            c = decoded as char;
         }
     }
-    output
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -100,6 +96,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let response: JSONResponse = serde_json::from_str(&decoded)?;
     let answers = response.items;
+    let mut decoded_answers: Vec<String> = Vec::new();
+
     answers
         .iter()
         .filter(|item| {
@@ -108,12 +106,17 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
             item.is_accepted
         })
-        .for_each(move |answer| {
-            pp.input_from_bytes(answer.body_markdown.as_bytes())
-                .language("markdown")
-                .print()
-                .unwrap();
+        .for_each(|answer| {
+            let url_decoded = htmlescape::decode_html(&answer.body_markdown).unwrap();
+            decoded_answers.push(url_decoded);
         });
+
+    decoded_answers.iter().for_each(move |answer| {
+        pp.input_from_bytes(answer.as_bytes())
+            .language("markdown")
+            .print()
+            .unwrap();
+    });
 
     Ok(())
 }
