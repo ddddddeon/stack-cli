@@ -1,7 +1,7 @@
 #+TITLE: stack-cli
 A command-line stackoverflow client
 
-file:tty.gif]]
+[[file:tty.gif]]
 
 ** Installation
 #+begin_src bash
@@ -23,5 +23,3 @@ Set the following environment variables:
 
 The first 10 results will be output to the terminal.
 Enter the number corresponding to the StackOverflow question you'd like to view, and it will be pretty-printed as markdown.
-
-[[
