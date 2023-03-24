@@ -1,6 +1,6 @@
 [package]
 name = "stack-cli"
-version = "0.1.1"
+version = "0.1.2"
 description = "A command-line stackoverflow client"
 license = "MIT"
 edition = "2021"

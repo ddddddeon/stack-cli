@@ -44,10 +44,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         })
         .map(
             |answer| match htmlescape::decode_html(&answer.body_markdown) {
-                Ok(d) => {
-                    dbg!(&d);
-                    d
-                }
+                Ok(d) => d,
                 Err(_) => answer.body_markdown.clone(),
             },
         )
