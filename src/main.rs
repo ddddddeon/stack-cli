@@ -2,7 +2,7 @@ use bat::PrettyPrinter;
 use regex::Regex;
 use reqwest::blocking::get;
 use select::{document::Document, predicate::Name};
-use stack_cli::{construct_google_url, gather_answers, Question};
+use stack_cli::{construct_google_url, prompt, Question};
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -33,7 +33,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 })
         })?;
 
-    let answers = gather_answers(questions)?;
+    let answers = prompt(questions)?;
     answers
         .iter()
         .filter(|item| {
@@ -44,7 +44,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         })
         .map(
             |answer| match htmlescape::decode_html(&answer.body_markdown) {
-                Ok(d) => d,
+                Ok(d) => {
+                    dbg!(&d);
+                    d
+                }
                 Err(_) => answer.body_markdown.clone(),
             },
         )
