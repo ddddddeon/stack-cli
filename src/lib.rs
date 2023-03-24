@@ -47,9 +47,8 @@ pub fn prompt(questions: Vec<Question>) -> Result<Vec<Answer>, Box<dyn Error>> {
     }
 
     let question = &questions[num as usize];
-    let answers = gather_answers(question)?;
 
-    Ok(answers)
+    gather_answers(question)
 }
 
 pub fn gather_answers(question: &Question) -> Result<Vec<Answer>, Box<dyn Error>> {
