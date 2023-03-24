@@ -36,13 +36,12 @@ pub fn prompt(questions: Vec<Question>) -> Result<Vec<Answer>, Box<dyn Error>> {
     for (i, question) in questions.iter().enumerate() {
         println!("{}. {}", i, question.name);
     }
-
     print!("> ");
     io::stdout().flush()?;
+
     let mut num = String::new();
     io::stdin().read_line(&mut num)?;
     let num: i32 = num.trim().parse()?;
-
     if num as usize >= questions.len() {
         return Err("Number too high".into());
     }
